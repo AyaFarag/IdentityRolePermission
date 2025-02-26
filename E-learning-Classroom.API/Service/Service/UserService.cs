@@ -32,30 +32,48 @@ namespace E_learning_Classroom.API.Service.Service
 
         public async Task<UserResponse> RegisterAsync(UserRegisterRequest request)
         {
-            _logger.LogInformation("Registering user");
+           //1 - ensure the user is not exist before
+            
             var existingUser = await _userManager.FindByEmailAsync(request.Email);
             if (existingUser != null)
             {
-                _logger.LogError("Email already exists");
+                
                 throw new Exception("Email already exists");
             }
+            //------------------------------------------------------------------------
+
+
 
             var newUser = _mapper.Map<ApplicationUser>(request);
 
             // Generate a unique username
             newUser.UserName = GenerateUserName(request.FirstName, request.LastName);
-            var result = await _userManager.CreateAsync(newUser, request.Password);
+
+            var result = await _userManager.CreateAsync(newUser, request.Password); // registered
+           
+            
+            
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                 _logger.LogError("Failed to create user: {errors}", errors);
                 throw new Exception($"Failed to create user: {errors}");
             }
+
+
+
             _logger.LogInformation("User created successfully");
-            await _tokenService.GenerateToken(newUser);
+            var response =  _mapper.Map<UserResponse>(newUser);
+            var token = await _tokenService.GenerateToken(newUser);
+
             newUser.CreateAt = DateTime.Now;
             newUser.UpdateAt = DateTime.Now;
-            return _mapper.Map<UserResponse>(newUser);
+
+            response.AccessToken = token;
+            response.CreateAt = newUser.CreateAt;
+            response.UpdateAt = newUser.UpdateAt;
+
+            return response;
         }
 
         private string GenerateUserName(string firstName, string lastName)
@@ -89,7 +107,7 @@ namespace E_learning_Classroom.API.Service.Service
             }
 
             // Generate access token
-            var token = await _tokenService.GenerateToken(user);
+            var token = await _tokenService.GenerateToken(user); // gernerate token
 
             // Generate refresh token
             var refreshToken = _tokenService.GenerateRefreshToken();
@@ -261,9 +279,11 @@ namespace E_learning_Classroom.API.Service.Service
             await _userManager.DeleteAsync(user);
         }
 
-        public async Task<IEnumerable<ApplicationUser>> GetAllAsync()
+        public async Task<IEnumerable<UserResponse>> GetAllAsync()
         {
-            return _userManager.Users.ToList();
+            var users = _userManager.Users.ToList();  // repository - Interface DI -- Performance /// DI
+            var map = _mapper.Map<IEnumerable<UserResponse>>(users);
+            return map;
         }
     }
 }

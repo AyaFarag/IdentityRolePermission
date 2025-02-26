@@ -18,7 +18,9 @@ namespace E_learning_Classroom.API.Controllers
             _userService = userService;
             _userManager = userManager;
         }
+
         [HttpGet("users")]
+        [Authorize]
         public async Task<IActionResult> GetAll()
         {
             var users = await _userService.GetAllAsync();

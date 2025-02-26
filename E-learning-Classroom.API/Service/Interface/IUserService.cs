@@ -14,7 +14,7 @@ namespace E_learning_Classroom.API.Service.Interface
         Task<UserResponse> GetByIdAsync(Guid id);
         Task<UserResponse> UpdateAsync(Guid id, UpdateUserRequest request);
         Task DeleteAsync(Guid id);
-        Task<IEnumerable<ApplicationUser>> GetAllAsync();
+        Task<IEnumerable<UserResponse>> GetAllAsync();
 
 
     }

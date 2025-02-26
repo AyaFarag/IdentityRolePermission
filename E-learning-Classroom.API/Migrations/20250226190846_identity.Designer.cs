@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_learning_Classroom.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250210035930_identity")]
+    [Migration("20250226190846_identity")]
     partial class identity
     {
         /// <inheritdoc />

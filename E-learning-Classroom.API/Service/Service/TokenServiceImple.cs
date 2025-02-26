@@ -25,7 +25,7 @@ namespace E_learning_Classroom.API.Service.Service
         {
             _userManager = userManager;
             _logger = logger;
-            var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
+            var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>(); // mapping
             if (jwtSettings == null || string.IsNullOrEmpty(jwtSettings.Key))
             {
                 throw new InvalidOperationException("JWT secret key is not configured.");
@@ -41,10 +41,13 @@ namespace E_learning_Classroom.API.Service.Service
 
         public async Task<string> GenerateToken(ApplicationUser user)
         {
+            // steps to generate token
+
             var singingCredentials = new SigningCredentials(_secretKey, SecurityAlgorithms.HmacSha256);
             var claims = await GetClaimsAsync(user);
             var tokenOptions = GenerateTokenOptions(singingCredentials, claims);
-            return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+           
+            return new JwtSecurityTokenHandler().WriteToken(tokenOptions); // token string
         }
 
         private async Task<List<Claim>> GetClaimsAsync(ApplicationUser user)
